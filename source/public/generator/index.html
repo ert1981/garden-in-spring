@@ -1,0 +1,66 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The garden in spring — random preview</title>
+<!-- Random-preview generator: the SAME page shape resolver.abx.io serves for a minted token (tokenData + ABX shim,
+     p5@1.9.0 from jsDelivr, then the exact on-chain v3 script), but the seed is a random hash from ?hash=. -->
+<style>html,body{margin:0;padding:0;overflow:hidden}canvas{display:block}</style>
+<script>(function () {
+  var q = new URLSearchParams(location.search), h = String(q.get('hash') || '');
+  if (!/^0x[0-9a-fA-F]{64}$/.test(h)) {
+    var b = new Uint8Array(32); crypto.getRandomValues(b);
+    h = '0x' + Array.prototype.map.call(b, function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+  }
+  window.abxTokenData = {"chainId": 8453, "contractAddress": "0x28f05f5c1dcf9a2a56447c6b6082e8c9c2c25986", "render.aspectRatio": "1.5", "seed": h.toLowerCase(), "tokenId": "0"};
+})();</script>
+<script>(function () {
+  var abx = (window.abx = window.abx || {});
+  function fromQuery() {
+    try {
+      var q = new URLSearchParams(location.search);
+      var packed = q.get('abx');
+      if (packed) {
+        var b64 = packed.replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), function (c) { return c.charCodeAt(0); })));
+      }
+      // coordinate floor: enough for a deterministic piece opened bare from a gateway
+      if (q.get('contract') && q.get('tokenId')) {
+        return {
+          chainId: Number(q.get('chainId') || 1),
+          contractAddress: String(q.get('contract')).toLowerCase(),
+          tokenId: String(q.get('tokenId')),
+        };
+      }
+    } catch (e) {}
+    return null;
+  }
+  abx.tokenData = window.abxTokenData || fromQuery();
+  abx.__traits = null;
+  abx.__done = false;
+  /** The script reports its computed traits (script-defined features; captured at render). */
+  abx.traits = function (t) {
+    abx.__traits = t;
+    try { document.dispatchEvent(new CustomEvent('abx:traits', {detail: t})); } catch (e) {}
+    return t;
+  };
+  /** Output-complete — the capture point for the render effect. Optional (timeout fallback). */
+  abx.done = function () {
+    abx.__done = true;
+    try { document.dispatchEvent(new CustomEvent('abx:done')); } catch (e) {}
+  };
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+</head><body>
+<script src="sketch.abx.js"></script>
+<script>
+/* Generator-page-only tweak (the on-chain script is untouched): show the Hafez verse overlay by default.
+   showInscr / paused / render are the script's own top-level bindings; 'I' still toggles it as usual. */
+try { showInscr = true; } catch (e) {}
+function abxToggleVerse() { try { showInscr = !showInscr; if (typeof paused !== 'undefined' && paused) render(); } catch (e) {} }
+/* The mint page forwards the I key here when the frame itself has no focus (same-origin postMessage only). */
+window.addEventListener('message', function (ev) {
+  if (ev.origin !== location.origin) return;
+  if (ev.data && ev.data.type === 'garden:key' && (ev.data.key === 'i' || ev.data.key === 'I')) abxToggleVerse();
+});
+</script>
+</body></html>
